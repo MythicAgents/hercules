@@ -18,7 +18,7 @@ class JobKillCommand(CommandBase):
     cmd = "job_kill"
     needs_admin = False
     help_cmd = "job_kill [task_id]"
-    description = "Kill a long running job and return anyway output"
+    description = "Kill a long running job"
     version = 1
     is_exit = False
     is_file_browse = False
