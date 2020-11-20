@@ -1,4 +1,4 @@
-kfrom CommandBase import *
+from CommandBase import *
 import json
 
 
