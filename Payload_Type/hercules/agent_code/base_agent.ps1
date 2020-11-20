@@ -318,21 +318,8 @@ function Process-Taskings {
                 }
 
             }else{
-                Switch ($job.command) {
-                "job_kill" {
-                    $index = 0..($Script:Jobs.Count -1) | Where { $Script:Jobs[$_].task_id -eq $job.parameters }
-                    $job.result = $Script:Jobs[$index].pshost.EndInvoke($job.job_object)
-                    $job.pshost.Dispose()
-                    $job.completed = $true
-                    break
-                }
-                default {
-                    Execute-Command -task $job | Out-Null
-                    break
-                }
+                Execute-Command -task $job | Out-Null
             }
-            }
-
         }
     }
 }
