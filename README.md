@@ -1,6 +1,6 @@
 # Hercules - SOCON-2020 - Zero to Hero - How to Create a Custom Mythic Agent
 
-![](./agent_icons/hercules.svg =200x)
+![](./agent_icons/hercules.svg | width=200)
 
 ## Summary
 Hercules is a barebones Mythic Agent written in PowerShell, designed for use in the SOCON-2020 Zero to Hero - How to Create a Custom Mythic Agent workshop. It's functionality includes basic commands, such as PowerShell execution, process listing, and loading new commands.
