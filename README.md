@@ -1,4 +1,7 @@
-# Hercules - SOCON-2020 - Zero to Hero - How to Create a Custom Mythic Agent
+# DEPRECATED 
+This agent is deprecated and no longer updated to match the Mythic repository
+
+## Hercules - SOCON-2020 - Zero to Hero - How to Create a Custom Mythic Agent
 
 <img src="./agent_icons/hercules.svg" width="200">
 
