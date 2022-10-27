@@ -1,0 +1,4 @@
+mythic_payloadtype_container==0.1.18
+mythic_translator_container
+mythic_c2_container==0.0.31
+mythic

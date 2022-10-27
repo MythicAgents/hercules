@@ -7,65 +7,49 @@ pre = "<b>3. </b>"
 
 ## Development Environment
 
-For development, all you need is a text editor an a Windows host with PowerShell v5. We recommend Visual Studio Code or PowerShell ISE as the editor.
+For command development, please use golang v1.17+
 
 ## Adding Commands
 
-Command files are located in `hercules/agent_code` as `command.ps1`. There are two kinds of command files - those that are more management oriented and run within the general agent space, and pure tasking commands that execute within their own pshost space. 
+- Create a new folder with the name of the command in `Payload_Types/poseidon/agent_code/[COMMAND]`.
+- Inside the folder create a single go file called `command.go`. If the implementation of the command is compatible with both macOS and Linux, only a single go file should be necessary. If the implementation is different, create two additional files. All files that are for the darwin/macOS implementation should have the nomenclature `command_darwin.go` and `command_linux.go` for Linux. There are a minimum set of imports that are required for any command.
+```
+import (
+	"github.com/MythicAgents/poseidon/Payload_Type/poseidon/agent_code/pkg/utils/structs"
+)
+```
 
-A more management command example of of the following format:
+- The results/output for a command should be saved to a `Response` struct.  
+- The `Completed` status should be set
+- The `Status` should be set to `error` if you're erroring out of the task for some reason
+- Send the resulting message out to Mythic via `task.Job.SendResponses` channel
 
 ```
-function global:job_list {
-    param($Job)
-    try {
-        $cur_jobs = $Script:Jobs | %{
-            [pscustomobject]@{
-                task_id = $_.task_id
-                command = $_.command
-                parameters = $_.parameters
-                result = $_.result
-                started = $_.started
-                error = $_.error
-                completed = $_.completed
-            }
-        }
-        return [pscustomobject]@{
-            completed = $true
-            user_output = $cur_jobs | ConvertTo-Json
-        } | ConvertTo-Json -Depth 4 -Compress
-    }
-    catch {
-        return [pscustomobject]@{
-            completed = $true
-            user_output = $error[0] | Out-String
-            status = "error"
-        } | ConvertTo-Json -Depth 4 -Compress
-    }
+func Run(task structs.Task) {
+	msg := structs.Response{}
+	msg.TaskID = task.TaskID
+	msg.UserOutput = "test output"
+	msg.Completed = true
+	task.Job.SendResponses <- msg
+	return
 }
-$Script:Management_Commands['job_list'] = 'job_list'
 ```
 
-Notice where the command name `job_list` is located within there and that it returns JSON via PSObjects.
-
-An example of a standard tasking command is as follows:
-
-```
-$Script:Commands.powershell = {
-    function Start-Function { 
-        param($Arguments)
-        Invoke-Expression $Arguments
-    }
-}
-
-```
-
-This kind of command must always have `function Start-Function` with an argument of `$Arguments`.
-
-
-To add a new command you need to create one of these two kinds of commands as `.ps1` files in `hercules/agent_code` and you also need to create the corresponding .py file in `hercules/mythic/agent_functions`.
+Please refer to the cat command in `Payload_Types/poseidon/agent_code/cat/cat.go` as an example.
 
 
 ## Adding C2 Profiles
 
-Hercules currently only supports the HTTP profile. To add the ability for more profiles requires splitting out the basic HTTP get/post requests and adding in the required transports for new profiles. Ideally, you can abstract this away so that new profiles can be easily created and swaped in at creation time.
+- Add C2 profile code to the `Payload_Types/poseidon/pkg/profiles/` folder in file name that matches the profile 
+  (e.g., `http.go` or `websocket.go`)
+- Create a structure that will hold the configuration for your profile. Your C2 structure/profile should conform to 
+  the Profile interface defined in `Payload_Types/poseidon/agent_code/pkg/profiles/profile.go`
+- C2 profile parameters are passed in at build time using Go's `-X` ldflags options which only sets string variables
+  - Create package-level _string_ variables for each C2 profile configurable option (e.g., `var USER_AGENT string`)
+  - Create a `New()` function that converts the string variables to the desired format, build the profile structure, 
+    and return a `Profile` object. The returned object should be your profile specific structure that fulfills the 
+    `Profile` interface
+- The C2 profile must be specified as a build condition at the top of the go file (e.g., `// +build http`). 
+  This ensures only the selected C2 profile is compiled into the agent
+
+

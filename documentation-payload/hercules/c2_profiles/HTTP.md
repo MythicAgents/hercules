@@ -5,10 +5,10 @@ weight = 102
 +++
 
 ## Summary
-The `hercules` agent uses a series of `POST` web requests to send responses for tasking and a series of `GET` requests to get tasking from the Mythic server. 
+
+
+The `poseidon` agent uses HTTP POST messages for getting tasking and sending responses. The GET Query parameter is not used. This is done as an optimization step so that even when checking for tasking, we can pass along messages from linked agents or SOCKS data. 
+
 
 ### Profile Option Deviations
-
-#### Callback Host
-The URL for the redirector or Mythic server. This must include the protocol to use (e.g. `http://` or `https://`). 
 

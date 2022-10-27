@@ -1,64 +1,131 @@
-from PayloadBuilder import *
+from mythic_payloadtype_container.PayloadBuilder import *
+from mythic_payloadtype_container.MythicCommandBase import *
+from mythic_payloadtype_container.MythicRPC import *
 import asyncio
 import os
-from distutils.dir_util import copy_tree
-import tempfile
-import base64
+import json
 
-# Icons made by "https://www.flaticon.com/authors/freepik" "Freepik"
+# Enable additional message details to the Mythic UI
+debug = False
 
-class MyNewAgent(PayloadType):
 
-    name = "hercules" 
-    file_extension = "ps1"
-    author = "@Airzero24"
-    supported_os = [  
-        SupportedOS.Windows
-    ]
-    wrapper = False  
-    wrapped_payloads = []  
-    note = "This payload uses PowerShell to create a simple agent for demonstration purposes"
-    supports_dynamic_loading = True
-    build_parameters = {
-        "output": BuildParameter(
-            name="output",
+class Hercules(PayloadType):
+    name = "hercules"
+    file_extension = "exe"
+    author = "@xorrior, @djhohnstein, @Ne0nd0g, @its_a_feature_"
+    supported_os = [SupportedOS.Linux, SupportedOS.MacOS, SupportedOS.Windows]
+    wrapper = False
+    wrapped_payloads = []
+    note = "A test small agent for Mythic Workshops"
+    supports_dynamic_loading = False
+    mythic_encrypts = True
+    build_parameters = [
+        BuildParameter(
+            name="architecture",
             parameter_type=BuildParameterType.ChooseOne,
-            description="Choose output format",
-            choices=["ps1", "base64"],
-        )
-    }
-    c2_profiles = ["HTTP"]
-    support_browser_scripts = [
-        BrowserScript(script_name="create_table", author="@its_a_feature_")
+            description="Choose the agent's architecture ",
+            choices=["AMD_x64", "ARM_x64"],
+            default_value="AMD_x64",
+        ),
     ]
+    c2_profiles = ["http", "hercules_c2"]
+    translation_container = None  # "hercules_translator" # None
 
     async def build(self) -> BuildResponse:
+        print(self.commands.get_commands())
+        create_payload = await MythicRPC().execute(
+            "create_callback", payload_uuid=self.uuid, c2_profile="http"
+        )
         # this function gets called to create an instance of your payload
-        resp = BuildResponse(status=BuildStatus.Success)
-        # create the payload
+        resp = BuildResponse(status=BuildStatus.Error)
+        target_os = "linux"
+        if self.selected_os == "macOS":
+            target_os = "darwin"
+        elif self.selected_os == "Windows":
+            target_os = "windows"
+        if len(self.c2info) != 1:
+            resp.build_stderr = "hercules only accepts one c2 profile at a time"
+            return resp
         try:
-            command_code = ""
-            for cmd in self.commands.get_commands():
-                command_code += (
-                    open(self.agent_code_path / "{}.ps1".format(cmd), "r").read() + "\n"
-                )
-            base_code = open(
-                self.agent_code_path / "base_agent.ps1", "r"
-            ).read()
-            base_code = base_code.replace("UUID_HERE", self.uuid)
-            base_code = base_code.replace("COMMANDS_HERE", command_code)
-            for c2 in self.c2info:
-                profile = c2.get_c2profile()["name"]
-                for key, val in c2.get_parameters_dict().items():
-                    base_code = base_code.replace(key, val)
-            if self.get_parameter("output") == "base64":
-                    resp.payload = base64.b64encode(base_code.encode())
-                    resp.set_message("Successfully Built")
-                    resp.status = BuildStatus.Success
+            agent_build_path = os.path.join("..", "agent_code")
+
+            # Get the selected C2 profile information (e.g., http or websocket)
+            c2 = self.c2info[0]
+            profile = c2.get_c2profile()["name"]
+            if profile not in self.c2_profiles:
+                resp.build_message = "Invalid c2 profile name specified"
+                return resp
+
+            # This package path is used with Go's "-X" link flag to set the value string variables in code at compile
+            # time. This is how each profile's configurable options are passed in.
+            hercules_repo_profile = (
+                f"github.com/MythicAgents/hercules/Payload_Type/hercules/pkg/profiles"
+            )
+
+            # Build Go link flags that are passed in at compile time through the "-ldflags=" argument
+            # https://golang.org/cmd/link/
+            ldflags = f"-s -w -X '{hercules_repo_profile}.UUID={self.uuid}'"
+            if self.translation_container is not None:
+                ldflags += f"-X '{hercules_repo_profile}.UseCustomC2Format=True'"
+            # Iterate over the C2 profile parameters and associated variable through Go's "-X" link flag
+            for key, val in c2.get_parameters_dict().items():
+                # dictionary instances will be crypto components
+                if isinstance(val, dict):
+                    ldflags += f" -X '{hercules_repo_profile}.{key}={val['enc_key']}'"
+                elif key == "headers":
+                    v = json.dumps(val).replace('"', '\\"')
+                    ldflags += f" -X '{hercules_repo_profile}.{key}={v}'"
+                else:
+                    if val:
+                        ldflags += f" -X '{hercules_repo_profile}.{key}={val}'"
+            # Set the Go -buildid argument to an empty string to remove the indicator
+            ldflags += " -buildid="
+            goarch = "amd64"
+            if self.get_parameter("architecture") == "ARM_x64":
+                goarch = "arm64"
+            command = ""
+            if target_os == "windows":
+                command += f' $env:GOOS = "{target_os}" ; $env:GOARCH = "{goarch}" ; '
             else:
-                resp.payload = base_code.encode()
-                resp.message = "Successfully built!"
+                command += f" GOOS={target_os} GOARCH={goarch} "
+            command += (
+                f'go build -tags {profile} -ldflags "{ldflags}" -o hercules-{target_os}'
+            )
+            # Execute the constructed xgo command to build Poseidon
+            proc = await asyncio.create_subprocess_shell(
+                command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                cwd=agent_build_path,
+            )
+
+            # Collect and data written Standard Output and Standard Error
+            stdout, stderr = await proc.communicate()
+            if stdout:
+                resp.build_stdout += f"\n[STDOUT]\n{stdout.decode()}"
+                if debug:
+                    resp.build_message += f"\n[BUILD]{command}\n"
+            if stderr:
+                resp.build_stderr += f"\n[STDERR]\n{stderr.decode()}"
+                if debug:
+                    resp.build_stderr += f"\n[BUILD]{command}\n"
+            output_path = os.path.join(agent_build_path, f"hercules-{target_os}")
+            if os.path.exists(output_path):
+                resp.payload = open(output_path, "rb").read()
+                os.remove(output_path)
+            else:
+                resp.build_stderr += f"{output_path} does not exist"
+                resp.status = BuildStatus.Error
+                return resp
+
+            # Successfully created the payload without error
+            resp.build_message += (
+                f"\nCreated Hercules payload!\n"
+                f"OS: {target_os}, "
+                f"C2 Profile: {profile}\n[BUILD]{command}\n"
+            )
+            resp.status = BuildStatus.Success
+            return resp
         except Exception as e:
-            resp.set_status(BuildStatus.Error)
-            resp.set_message("Error building payload: " + str(e))
+            resp.build_stderr += "\n" + str(e)
         return resp
