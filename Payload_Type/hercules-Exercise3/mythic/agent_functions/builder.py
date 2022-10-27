@@ -24,11 +24,11 @@ class Hercules(PayloadType):
             name="architecture",
             parameter_type=BuildParameterType.ChooseOne,
             description="Choose the agent's architecture ",
-            choices=["AMD_x64", "ARM_x64"],
+            choices=["AMD_x64"],
             default_value="AMD_x64",
         ),
     ]
-    c2_profiles = ["http", "hercules_c2"]
+    c2_profiles = ["http"]
     translation_container = None  # "hercules_translator" # None
 
     async def build(self) -> BuildResponse:
@@ -57,9 +57,7 @@ class Hercules(PayloadType):
 
             # This package path is used with Go's "-X" link flag to set the value string variables in code at compile
             # time. This is how each profile's configurable options are passed in.
-            hercules_repo_profile = (
-                f"github.com/MythicAgents/hercules/Payload_Type/hercules/pkg/profiles"
-            )
+            hercules_repo_profile = f"github.com/MythicAgents/hercules/Payload_Type/hercules/agent_code/pkg/profiles"
 
             # Build Go link flags that are passed in at compile time through the "-ldflags=" argument
             # https://golang.org/cmd/link/
