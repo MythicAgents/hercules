@@ -32,7 +32,7 @@ class ShellCommand(CommandBase):
         passed_args = shlex.split(task.args.command_line)
         if task.callback.payload["os"] == "Windows":
             task.args.add_arg(
-                "path", "C:\\Windows\\System32\WindowsPowerShell\\v1. 0\\powershell.exe"
+                "path", "C:\\Windows\\System32\WindowsPowerShell\\v1.0\\powershell.exe"
             )
             passed_args.insert(0, "/c")
         else:
