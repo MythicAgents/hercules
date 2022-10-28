@@ -82,7 +82,7 @@ class Hercules(PayloadType):
                 goarch = "arm64"
             command = ""
             if target_os == "windows":
-                command += f' $env:GOOS = "{target_os}" ; $env:GOARCH = "{goarch}" ; '
+                command += f" set GOOS={target_os}&& set GOARCH={goarch}&& "
             else:
                 command += f" GOOS={target_os} GOARCH={goarch} "
             command += (
