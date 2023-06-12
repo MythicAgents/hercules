@@ -39,7 +39,7 @@ async def main():
                 "c2_profile": "http",
                 "c2_profile_parameters": {
                     "callback_host": callback_host,
-                    "callback_port": str(callback_port),
+                    "callback_port": callback_port,
                 },
             }
         ],
