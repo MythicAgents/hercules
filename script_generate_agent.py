@@ -5,7 +5,7 @@ from mythic import mythic
 
 
 async def main():
-    mythic_login_username = "mythic_admin"
+    mythic_login_username = "mythic_administrator"
     mythic_login_password = "mythic_password"
     mythic_host = "mythic.lab"
 
@@ -39,7 +39,7 @@ async def main():
                 "c2_profile": "http",
                 "c2_profile_parameters": {
                     "callback_host": callback_host,
-                    "callback_port": str(callback_port),
+                    "callback_port": callback_port,
                 },
             }
         ],

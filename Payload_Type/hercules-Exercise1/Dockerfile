@@ -1,1 +1,1 @@
-FROM itsafeaturemythic/xgolang_payload:0.1.4
+FROM itsafeaturemythic/mythic_python_base:latest

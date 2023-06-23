@@ -8,7 +8,7 @@
 
 This is a fork of the [Poseidon](https://github.com/MythicAgents/poseidon) agent with a much smaller subset of commands available. This version is meant to be used as a base training agent for learning how to do Mythic agent and C2 development with regards to the Mythic side of things. The exercises for this workshop do not go into the agent side of development, but instead focus on how to make development easier on a windows host and how to interact with Mythic.
 
-This agent was developed for Mythic 2.3.13 in October 2022 for use with the [Mythic Developer Workshop - Laying the Foundation](). It is *NOT* meant to be used in operations or anywhere outside of this workshop.
+This agent was developed for Mythic 3.0.1 in June 2023 for use with the [Mythic Developer Workshop - Laying the Foundation](). It is *NOT* meant to be used in operations or anywhere outside of this workshop.
 
 * [Exercise 0 - Install Mythic](/Workshop%20Exercises/Exercise%200.md)
 * [Exercise 1 - Remote Agent Development](/Workshop%20Exercises/Exercise%201.md)
