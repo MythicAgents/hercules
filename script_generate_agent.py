@@ -9,9 +9,9 @@ async def main():
     mythic_login_password = "mythic_password"
     mythic_host = "mythic.lab"
 
-    callback_host = mythic_host
+    callback_host = f"http://{mythic_host}"
     callback_port = 80
-    agent_name = "hercules_exercise2"
+    agent_name = "hercules-exercise2"
 
     print(
         f"[*] Connecting to Mythic at {mythic_host} with username {mythic_login_username}"

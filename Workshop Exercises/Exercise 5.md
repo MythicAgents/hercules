@@ -33,7 +33,7 @@ For simplicity's sake, the `hercules_c2` is a clone of the `http` profile, just 
 4. `.\start_hercules_c2.ps1`
 5. `.\start_hercules_exercise5.ps1`
 
-You should now see a new C2 Profile show up in the Mythic UI.
+You should now see a new C2 Profile show up in the Mythic UI. Make sure to leave the translation container running, we'll use that one too.
 
 ## C2 Profile's server
 
@@ -63,6 +63,7 @@ We now need to update the agent to only do `GET` requests and track this as a se
 The `C:\hercules\Payload_Type\hercules-Exercise5\agent_code\pkg\profiles` folder has a new `hercules_c2.go` file. 
 This file is largely the same as the `http.go` file except that it performs a GET request instead of a POST request for all of its traffic.
 
-1. Generate a new agent using `hercules_c2` and get a callback (either download and run the `exe` or get the UUID and encryption key and generate a new payload with `make`)
+1. Generate a new agent using `hercules_c2` and get a callback (either download and run the `exe` or get the UUID and encryption key and generate a new payload with `make build_and_run_hercules_c2`)
 
+In the lab, we have `python` execution going to VSCode, so when the C2 Profile tries to start, we'll get a VSCode popup. Use `.\start_hercules_c2_server.ps1` to run the server component separately for now.
 Notice how in the callback table and on the payloads table that it says the new `hercules_c2` profile name.

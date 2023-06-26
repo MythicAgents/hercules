@@ -34,7 +34,7 @@ class ShellCommand(CommandBase):
         passed_args = shlex.split(taskData.args.command_line)
         if taskData.Payload.OS == "Windows":
             taskData.args.add_arg(
-                "path", "C:\\Windows\\System32\WindowsPowerShell\\v1.0\\powershell.exe"
+                "path", "cmd.exe"
             )
             passed_args.insert(0, "/c")
         else:
@@ -42,6 +42,7 @@ class ShellCommand(CommandBase):
             passed_args.insert(0, "-c")
         taskData.args.add_arg("args", passed_args, type=ParameterType.Array)
         response.DisplayParams = taskData.args.get_arg("path") + " " + " ".join(passed_args)
+        response.CommandName = "run"
         return response
 
     async def process_response(self, task: PTTaskMessageAllData, response: any) -> PTTaskProcessResponseMessageResponse:

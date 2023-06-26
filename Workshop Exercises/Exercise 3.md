@@ -25,10 +25,10 @@ In our example, the `Makefile` has a few parameters at the top including a `HTTP
 
 We can edit anything in the `agent_code` folder without having to restart the `start_hercules_exercise3.ps1` program. You only need to restart that piece if something within the `agent_functions` folder changes. To show this:
 
-1. Issue the `run` command in Mythic: `run c:\winnt\system32\cmd.exe /c whoami`
+1. Issue the `run` command in Mythic: `run cmd.exe /c whoami`
 2. Wait for the agent to return output
 3. Stop your running agent and modify the `agent_code\run\run.go` file on line `45` to add ` + "\nmodified code"`.
 4. Run `make build_and_run_http` to get a new callback with your modified code
-5. re-issue your task in the new callback, `run c:\winnt\system32\cmd.exe /c whoami`
+5. re-issue your task in the new callback, `run cmd.exe /c whoami`
 
 Notice how your change was used without having to do anything with Mythic. The same thing is true even for a Docker-ized agent - the `agent_code` folder is mapped directly into the container, so changes don't require a container restart.

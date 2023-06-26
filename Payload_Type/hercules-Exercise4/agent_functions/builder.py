@@ -71,6 +71,8 @@ class Hercules(PayloadType):
             for key, val in c2.get_parameters_dict().items():
                 # dictionary instances will be crypto components
                 if key == "AESPSK":
+                    if val['enc_key'] is None:
+                        val['enc_key'] = ""
                     ldflags += f" -X '{hercules_repo_profile}.{key}={val['enc_key']}' "
                 elif key == "headers":
                     #v = json.dumps(val).replace('"', '\`"')

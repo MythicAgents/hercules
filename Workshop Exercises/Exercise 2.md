@@ -60,11 +60,11 @@ from mythic import mythic
 
 
 async def main():
-    mythic_login_username = "mythic_admin"
+    mythic_login_username = "mythic_administrator"
     mythic_login_password = "mythic_password"
     mythic_host = "mythic.lab"
 
-    callback_host = mythic_host
+    callback_host = f"http://{mythic_host}"
     callback_port = 80
 
     print(
