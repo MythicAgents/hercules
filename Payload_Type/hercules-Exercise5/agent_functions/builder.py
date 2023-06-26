@@ -60,7 +60,7 @@ class Hercules(PayloadType):
 
             # This package path is used with Go's "-X" link flag to set the value string variables in code at compile
             # time. This is how each profile's configurable options are passed in.
-            hercules_repo_profile = f"github.com/MythicAgents/hercules/Payload_Type/hercules/agent_code/pkg/profiles"
+            hercules_repo_profile = f"github.com/MythicAgents/hercules/Payload_Type/hercules-Exercise5/agent_code/pkg/profiles"
 
             # Build Go link flags that are passed in at compile time through the "-ldflags=" argument
             # https://golang.org/cmd/link/
@@ -71,6 +71,8 @@ class Hercules(PayloadType):
             for key, val in c2.get_parameters_dict().items():
                 # dictionary instances will be crypto components
                 if key == "AESPSK":
+                    if val['enc_key'] is None:
+                        val['enc_key'] = ""
                     ldflags += f" -X '{hercules_repo_profile}.{key}={val['enc_key']}' "
                 elif key == "headers":
                     #v = json.dumps(val).replace('"', '\`"')

@@ -17,21 +17,22 @@ Mythic supports many configuration options, but for now we'll just pre-set our a
 
 Services that need passwords but don't have them set automatically will generate passwords on first launch. This includes things like `RabbitMQ`, `PostgreSQL`, and the admin account. Normally, you shouldn't pre-configure these; however, for the lab to make things easier, we'll pre-configure the `RabbitMQ` password so we don't need to update configs along the way for the labs:
 
-5. `sudo ./mythic-cli config set RABBITMQ_PASSWORD PqR9XJ957sfHqcxj6FsBMj4p`
+5. `sudo ./mythic-cli config set RABBITMQ_PASSWORD WrSJkwAa5yexxytHQH580j3Rlb4Nrc`
 
 We'll want to start with everything fresh, so we'll clear out any existing `RabbitMQ` and `PostgreSQL` information:
 
 6. `sudo ./mythic-cli database reset`
 7. `sudo ./mythic-cli rabbitmq reset`
+8. `sudo ./mythic-cli config set REBUILD_ON_START false`
 
 #### Install C2 Profiles
 We will be creating our own Mythic Agent for this workshop (and eventually our own C2 Profile), but for now we'll install the `http` public C2 profile as a starting point:
 
-8. `sudo ./mythic-cli install github https://github.com/MythicC2Profiles/http`
+9. `sudo ./mythic-cli install github https://github.com/MythicC2Profiles/http`
 
 #### Start Mythic
 
-9. `sudo ./mythic-cli start`
+10. `sudo ./mythic-cli start`
 
 #### Log in
 

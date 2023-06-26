@@ -88,7 +88,7 @@ There's one thing we need to configure here - the `rabbitmq_config.json` file ne
 ex:
 ```json
 {
-  "rabbitmq_password": "PqR9XJ957sfHqcxj6FsBMj4p",
+  "rabbitmq_password": "WrSJkwAa5yexxytHQH580j3Rlb4Nrc",
   "rabbitmq_host": "mythic.lab",
   "mythic_host": "mythic.lab"
 }

