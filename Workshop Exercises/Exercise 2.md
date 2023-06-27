@@ -5,7 +5,7 @@ This sequence of events happens on the Windows `dev-desktop.lab` host.
 
 Now we're going to build our initial agent. The general flow for building is captured [here](https://docs.mythic-c2.net/message-flow/building-payloads):
 
-{{<mermaid>}}
+```mermaid
 sequenceDiagram
     participant O as Operator
     participant M as Mythic
@@ -32,7 +32,7 @@ sequenceDiagram
     P -->>- M: Send finished Payload
     M ->> M: Updates Payload build status
     M -->> O: Update with new Build Status
-{{< /mermaid >}}
+```
 
 We select and pass in all of our build and c2 configurations which all comes down to the agent's `async def build(self) -> BuildResponse:` function.
 
